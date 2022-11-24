@@ -4,6 +4,8 @@ class Tile:
         self.position = position
         self.neighbors = []
         self.name = name
+        self.blanks = []
+        self.flags = []
 
       def print_neighbors(self):
         try:
@@ -18,6 +20,7 @@ class Tile:
         for i in self.neighbors:
           if i.type == "Unclicked":
             blanks.append(i)
+        self.blanks = blanks
         return blanks
 
       def neighbor_flags(self):
@@ -25,5 +28,6 @@ class Tile:
         for i in self.neighbors:
           if i.type == "Flag":
             flags.append(i)
+        self.flags = flags
         return flags
 
