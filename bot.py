@@ -1,86 +1,31 @@
 from time import sleep
-from python_imagesearch.imagesearch import imagesearch
 import pyautogui
-import webbrowser
 import random
 import cv2
 from tile import Tile
 import math
-import keyboard
+import re
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 
-#doesnt get last line of squares
-#doest quite get all neighbors to flag or click
-#try selenium
-
-class mylist (list):
-    def __getitem__(self, n):
-        if n < 0:
-            raise IndexError("...")
-        return list.__getitem__(self, n)
 
 def get_board():
-    row = mylist()
-    board = mylist()
-    leftSide = 0
-    count = 0
-    for tile in pyautogui.locateAllOnScreen("img/unclicked_square.jpg", confidence=.95):
-        if(count == 0):
-            leftSide = tile.left
-        if(tile.left <= leftSide):
-            board.append(row)
-            row = mylist()
-            count = 0
+    squares = driver.find_elements(By.CLASS_NAME, "square")
+    board = {}
+    for i in squares:
+        element = i
+        type = i.get_attribute('class')
+        name = i.get_attribute('id')
+        tile = Tile(type, name, element)
+        board[name] = tile
         
-        pos = tile.left+(tile.width/2), tile.top+(tile.height/2)
-        name = "Tile_{}_{}".format(len(board), count)
-        newTile = Tile("Unclicked", pos, name)
-
-        row.append(newTile)
-        count += 1
     return board
 
 def designate_neighbors(board):
     for i in board:
-        rownum = board.index(i)
-        for j in i:
-            currentposition = i.index(j)
-
-            try:
-                topleft = board[rownum-1][currentposition-1]
-            except IndexError:
-                topleft = edge
-            try:
-                topmiddle = board[rownum-1][currentposition]
-            except IndexError:
-                topmiddle = edge
-            try:
-                topright = board[rownum-1][currentposition+1]
-            except IndexError:
-                topright = edge
-
-            try:
-                middleleft = i[currentposition-1]
-            except IndexError:
-                middleleft = edge
-            try:
-                middleright = i[currentposition+1]
-            except IndexError:
-                middleright = edge
-            
-            try:
-                bottomleft = board[rownum+1][currentposition-1]
-            except IndexError:
-                bottomleft = edge
-            try:
-                bottommiddle = board[rownum+1][currentposition]
-            except IndexError:
-                bottommiddle = edge
-            try:
-                bottomright = board[rownum+1][currentposition+1]
-            except IndexError:
-                bottomright = edge
-            
-            j.neighbors = [topleft, topmiddle, topright, middleleft, middleright, bottomleft, bottommiddle, bottomright]
+        tile = board.get(i)
+        i.neighbors = [topleft, topmiddle, topright, middleleft, middleright, bottomleft, bottommiddle, bottomright]
 
 def refresh(board): 
     flatBoard = flatten(board)
@@ -165,11 +110,14 @@ def click_blanks_after_flags(board):
     refresh(board)
     return moved
 
-webbrowser.open("https://minesweeperonline.com/", new = 0, autoraise = True)
+driver = webdriver.Firefox()
+driver.get("https://minesweeperonline.com/")
+
+
 pyautogui.moveTo(5,5)
 sleep(5)
 
-board = mylist(get_board())
+board = get_board()
 edge = Tile("Edge", [5, 5], "Edge")
 designate_neighbors(board)
 

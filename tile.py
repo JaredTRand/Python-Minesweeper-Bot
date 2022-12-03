@@ -1,7 +1,7 @@
 class Tile:
-      def __init__(self, type, position, name):
+      def __init__(self, type, name, element):
         self.type = type #Unclicked, Blank, Flag, 1, 2, 3, 4, 5, Edge
-        self.position = position
+        self.element = element
         self.neighbors = []
         self.name = name
         self.blanks = []
